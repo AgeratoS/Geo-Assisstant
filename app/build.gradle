@@ -16,6 +16,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+
+}
+
+
+repositories {
+    maven {
+        url "http://maven.google.com/"
+    }
 }
 
 dependencies {
@@ -25,4 +34,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.yandex.android:mapkit:3.3.1'
 }
