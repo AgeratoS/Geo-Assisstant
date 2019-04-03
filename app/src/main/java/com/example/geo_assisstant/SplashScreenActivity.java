@@ -13,7 +13,7 @@ import java.util.TimerTask;
 public class SplashScreenActivity extends AppCompatActivity {
     private Timer timer;
     private ProgressBar progressBar;
-    private int i=-20;
+    private int i=-20; //delay for smooth start progress
 
 
     @Override
@@ -23,15 +23,16 @@ public class SplashScreenActivity extends AppCompatActivity {
         progressBar=(ProgressBar)findViewById(R.id.progressBar);
         progressBar.setProgress(0);
 
+        //set fullscreen
         progressBar.getProgressDrawable().setColorFilter(
                 Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
 
-        final long period = 50;
+        final long period = 25;
         timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                //this repeats every 50 ms
+                //this repeats every 25 ms
                 if (i<101){
                     progressBar.setProgress(i);
                     i++;
