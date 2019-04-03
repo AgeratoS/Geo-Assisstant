@@ -2,6 +2,7 @@ package com.example.geo_assisstant;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
@@ -10,7 +11,11 @@ import com.yandex.mapkit.map.CameraPosition;
 import com.yandex.mapkit.mapview.MapView;
 
 public class MainActivity extends AppCompatActivity {
+
+
     private MapView _mapview;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,9 +25,10 @@ public class MainActivity extends AppCompatActivity {
 
         _mapview = (MapView)findViewById(R.id.mapview);
         _mapview.getMap().move(
-                new CameraPosition(new Point(55.751574, 37.573856), 11.0f, 0.0f, 0.0f),
+                new CameraPosition(new Point(51.670209, 39.205196), 11.0f, 0.0f, 0.0f),
                 new Animation(Animation.Type.SMOOTH, 0),
                 null);
+
     }
 
     @Override
