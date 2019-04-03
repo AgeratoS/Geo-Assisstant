@@ -13,7 +13,7 @@ import java.util.TimerTask;
 public class SplashScreenActivity extends AppCompatActivity {
     private Timer timer;
     private ProgressBar progressBar;
-    private int i=0;
+    private int i=-20;
 
 
     @Override
