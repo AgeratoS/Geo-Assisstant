@@ -20,29 +20,40 @@
         android:textColor="#fff"
         android:textSize="16sp" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
-        android:progressDrawable="@drawable/circle"
-        android:rotation="270" />
-    
-    <TextView
-        android:id="@+id/text_viewProgress"
+    <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/progressBar"
-        android:layout_alignTop="@id/progressBar"
-        android:layout_alignRight="@id/progressBar"
-        android:layout_marginVertical="60dp"
-        android:background="@android:color/transparent"
-        android:text="GEO Assistant"
-        android:gravity="center"
-        android:textSize="35dp"
-        android:textColor="#511d69"
-        />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/circle" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center"
+            android:progressDrawable="@drawable/circleprogress"
+            android:rotation="270" />
+
+        <TextView
+            android:id="@+id/text_viewProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:width="160dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:text="GEO Assistant"
+            android:textColor="#511d69"
+            android:textSize="35sp" />
+
+    </FrameLayout>
 
 </RelativeLayout>
