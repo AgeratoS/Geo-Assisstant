@@ -32,7 +32,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //this repeats every 50 ms
-                if (i<110){
+                if (i<101){
                     progressBar.setProgress(i);
                     i++;
                 }else{
