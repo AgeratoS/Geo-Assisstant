@@ -32,33 +32,69 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
     private MapView _mapview;
     private UserLocationLayer _userLocationLayer;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private AlertDialog.Builder _ad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //onRequestPermissionsResult();
 
         // Создание карты и всякая хуйня
         super.onCreate(savedInstanceState);
         MapKitFactory.setApiKey("6510675d-95b1-40ed-9948-689720a64118");
         MapKitFactory.initialize(this);
         setContentView(R.layout.activity_main);
-        _mapview = (MapView)findViewById(R.id.mapview);
+        _mapview = (MapView) findViewById(R.id.mapview);
 
-        // Запрос разрешений
+        // Проверка разрешений
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            requestPermission();
+        }
+    }
+    protected void requestPermission()
+    {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                MY_PERMISSIONS_REQUEST_LOCATION);
+    }
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions,
+                                           int[] grantResults)
+    {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            _ad = new AlertDialog.Builder(this);
+            _ad.setTitle("Отказ в получении геоданных");
+            _ad.setMessage("Для работы приложения необходимо разрешить определять ваше местоположение");
+            _ad.setPositiveButton("Выдать ращрешение", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    requestPermission();
+                }
+            });
+            _ad.create()
+                    .show();
+        }
+        else
+                {
+                // Permission has already been granted
+                onAllGood();
+                }
 
-        checkLocationPermission();
+    }
+    protected void onAllGood()
+    {
         _userLocationLayer = _mapview.getMap().getUserLocationLayer();
         _mapview.getMap().move(
                 new CameraPosition(new Point(0, 0), 16, 0.0f, 0.0f),
                 new Animation(Animation.Type.SMOOTH, 2),
                 null);
-        _mapview.getMap().setRotateGesturesEnabled(false);
+        // херня отрубает жест поворота камеры_mapview.getMap().setRotateGesturesEnabled(false);
         _mapview.getMap().move(new CameraPosition(new Point(0, 0), 16, 0, 0));
         _userLocationLayer.setEnabled(true);
         _userLocationLayer.setHeadingEnabled(true);
         _userLocationLayer.setObjectListener(this);
     }
-
     @Override
     protected void onStop()
     {
@@ -114,78 +150,4 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
     @Override
     public void onObjectUpdated(UserLocationView view, ObjectEvent event) {
     }
-
-    public boolean checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                new AlertDialog.Builder(this)
-                        .setTitle("Разрешение на получение геоданных")
-                        .setMessage("Для работы приложения предоставьте разрешение на определение вашего местоположения")
-                        .setPositiveButton("Разрешить", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                ActivityCompat.requestPermissions(MainActivity.this,
-                                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                        MY_PERMISSIONS_REQUEST_LOCATION);
-                            }
-                        })
-                        .create()
-                        .show();
-
-
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    // разрешение получено
-                    if (ContextCompat.checkSelfPermission(this,
-                            Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
-
-
-                        //Сюда можно воткнуть действия после выдачи разрешений
-                        //locationManager.requestLocationUpdates(provider, 400, 1, this);
-                    }
-
-                } else {
-                    // отказ в выдаче разрешений
-                    new AlertDialog.Builder(this)
-                            .setTitle("Отказ в получении геоданных")
-                            .setMessage("Для работы приложения необходимо разрешить определять ваше местоположение")
-                            .setPositiveButton("Закрыть приложение", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    finish();
-                                    System.exit(0);
-                                }
-                            })
-                            .create()
-                            .show();
-                }
-            }
-            return;
-        }
-
-    }
 }
-
