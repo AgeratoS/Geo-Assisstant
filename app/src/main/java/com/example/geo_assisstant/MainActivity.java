@@ -10,7 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.WindowManager;
+import android.view.View;
 
 import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
@@ -23,6 +23,7 @@ import com.yandex.mapkit.map.RotationType;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.user_location.UserLocationLayer;
 import com.yandex.mapkit.user_location.UserLocationObjectListener;
+
 import com.yandex.mapkit.user_location.UserLocationView;
 import com.yandex.runtime.image.ImageProvider;
 
@@ -84,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
                 // Permission has already been granted
                 onAllGood();
                 }
-
     }
     protected void onAllGood()
     {
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
        _userLocationLayer.setAnchor(
                 new PointF((float)(_mapview.getWidth() * 0.5), (float)(_mapview.getHeight() * 0.5)),
                 new PointF((float)(_mapview.getWidth() * 0.5), (float)(_mapview.getHeight() * 0.83)));
-       
+
         userLocationView.getArrow().setIcon(ImageProvider.fromResource(
                 this, R.drawable.user_arrow));
 
@@ -154,5 +154,12 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
 
     @Override
     public void onObjectUpdated(UserLocationView view, ObjectEvent event) {
+    }
+
+    public void onGPSButtonClick(View view) {
+        _mapview.getMap().move(
+                new CameraPosition(_userLocationLayer.cameraPosition().getTarget(), 16.0f, 0.0f, 0.0f),
+                new Animation(Animation.Type.SMOOTH, 1),
+                null);
     }
 }

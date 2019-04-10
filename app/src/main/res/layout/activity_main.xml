@@ -6,33 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/mapview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_centerHorizontal="true" />
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="154dp">
 
-        <ImageView
-            android:id="@+id/mapback1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/mapback"
-            android:scaleType="fitXY"
-            android:adjustViewBounds="true"/>
-
+        <ImageButton
+            android:id="@+id/gpsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/gpsbutton"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="50dp"
+            android:onClick="onGPSButtonClick"
+            android:background="@null"
+            android:transitionName="gpsButton"
+            />
     </FrameLayout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="76dp"
-        android:src="@drawable/yandex_logo_en"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
