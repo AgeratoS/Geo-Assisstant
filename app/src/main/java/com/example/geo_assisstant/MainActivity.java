@@ -50,6 +50,10 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
             // Permission is not granted
             requestPermission();
         }
+        else
+        {
+            onAllGood();
+        }
     }
     protected void requestPermission()
     {
@@ -112,12 +116,13 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
     }
     @Override
     public void onObjectAdded(UserLocationView userLocationView) {
-        _userLocationLayer.setAnchor(
+       _userLocationLayer.setAnchor(
                 new PointF((float)(_mapview.getWidth() * 0.5), (float)(_mapview.getHeight() * 0.5)),
                 new PointF((float)(_mapview.getWidth() * 0.5), (float)(_mapview.getHeight() * 0.83)));
-
+       
         userLocationView.getArrow().setIcon(ImageProvider.fromResource(
                 this, R.drawable.user_arrow));
+
 
         CompositeIcon pinIcon = userLocationView.getPin().useCompositeIcon();
 
