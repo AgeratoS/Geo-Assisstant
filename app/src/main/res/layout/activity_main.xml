@@ -21,13 +21,12 @@
 
         <ImageButton
             android:id="@+id/gpsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/gpsbutton"
-            android:layout_gravity="center|bottom"
-            android:layout_marginBottom="50dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/gpsbuttonanim"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="5dp"
             android:onClick="onGPSButtonClick"
-            android:background="@null"
             android:transitionName="gpsButton"
             />
     </FrameLayout>
