@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
-    <com.yandex.mapkit.mapview.MapView
-        android:id="@+id/mapview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerHorizontal="true" />
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        tools:ignore="MissingConstraints" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -21,13 +20,12 @@
 
         <ImageButton
             android:id="@+id/gpsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/gpsbutton"
-            android:layout_gravity="center|bottom"
-            android:layout_marginBottom="50dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/gpsbuttonanim"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="5dp"
             android:onClick="onGPSButtonClick"
-            android:background="@null"
             android:transitionName="gpsButton"
             />
     </FrameLayout>

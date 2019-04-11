@@ -4,47 +4,39 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.PointF;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
 
-import com.yandex.mapkit.Animation;
-import com.yandex.mapkit.MapKitFactory;
-import com.yandex.mapkit.geometry.Point;
-import com.yandex.mapkit.layers.ObjectEvent;
-import com.yandex.mapkit.map.CameraPosition;
-import com.yandex.mapkit.map.CompositeIcon;
-import com.yandex.mapkit.map.IconStyle;
-import com.yandex.mapkit.map.RotationType;
-import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.user_location.UserLocationLayer;
-import com.yandex.mapkit.user_location.UserLocationObjectListener;
 
-import com.yandex.mapkit.user_location.UserLocationView;
-import com.yandex.runtime.image.ImageProvider;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-public class MainActivity extends AppCompatActivity implements UserLocationObjectListener {
+public class MainActivity extends AppCompatActivity  {
 
 
-    private MapView _mapview;
+    private org.osmdroid.views.MapView _mapview = null;
     private UserLocationLayer _userLocationLayer;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private AlertDialog.Builder _ad;
+    private MyLocationNewOverlay mLocationOverlay;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         // Создание карты и всякая хуйня
         super.onCreate(savedInstanceState);
-        MapKitFactory.setApiKey("6510675d-95b1-40ed-9948-689720a64118");
-        MapKitFactory.initialize(this);
         setContentView(R.layout.activity_main);
-        _mapview = (MapView) findViewById(R.id.mapview);
 
+        _mapview = (org.osmdroid.views.MapView) findViewById(R.id.map);
+        _mapview.setTileSource(TileSourceFactory.MAPNIK);
+        _mapview.setBuiltInZoomControls(true);
+        _mapview.setMultiTouchControls(true);
         // Проверка разрешений
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -56,6 +48,11 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
             onAllGood();
         }
     }
+   /* @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        _mapview = new MapView(inflater.getContext(), 256, getContext());
+        return _mapview;
+    }*/
     protected void requestPermission()
     {
         ActivityCompat.requestPermissions(this,
@@ -86,80 +83,39 @@ public class MainActivity extends AppCompatActivity implements UserLocationObjec
                 onAllGood();
                 }
     }
+    public void onResume(){
+        super.onResume();
+        //this will refresh the osmdroid configuration on resuming.
+        //if you make changes to the configuration, use
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
+        _mapview.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+    }
+
+    public void onPause(){
+        super.onPause();
+        //this will refresh the osmdroid configuration on resuming.
+        //if you make changes to the configuration, use
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //Configuration.getInstance().save(this, prefs);
+        _mapview.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+    }
     protected void onAllGood()
     {
-        _userLocationLayer = _mapview.getMap().getUserLocationLayer();
-        _mapview.getMap().move(
-                new CameraPosition(new Point(0, 0), 16, 0.0f, 0.0f),
-                new Animation(Animation.Type.SMOOTH, 2),
-                null);
-        // херня отрубает жест поворота камеры_mapview.getMap().setRotateGesturesEnabled(false);
-        _mapview.getMap().move(new CameraPosition(new Point(0, 0), 16, 0, 0));
-        _userLocationLayer.setEnabled(true);
-        _userLocationLayer.setHeadingEnabled(true);
-        _userLocationLayer.setObjectListener(this);
+        IMapController mapController = _mapview.getController();
+        mapController.setZoom(9.5);
+        GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
+        mapController.setCenter(startPoint);
+        /*Context context = null;
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context),_mapview);
+        this.mLocationOverlay.enableMyLocation();
+        _mapview.getOverlays().add(this.mLocationOverlay);*/
     }
-    @Override
-    protected void onStop()
-    {
-        super.onStop();
-        _mapview.onStop();
-        MapKitFactory.getInstance().onStop();
-    }
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        _mapview.onStart();
-        MapKitFactory.getInstance().onStart();
-    }
-    @Override
-    public void onObjectAdded(UserLocationView userLocationView) {
-       _userLocationLayer.setAnchor(
-                new PointF((float)(_mapview.getWidth() * 0.5), (float)(_mapview.getHeight() * 0.5)),
-                new PointF((float)(_mapview.getWidth() * 0.5), (float)(_mapview.getHeight() * 0.83)));
-
-        userLocationView.getArrow().setIcon(ImageProvider.fromResource(
-                this, R.drawable.user_arrow));
-
-
-        CompositeIcon pinIcon = userLocationView.getPin().useCompositeIcon();
-
-        /* Это иконка около местоположения юзверя, но смотрится она хуёво, поэтому убрал  (скрин https://pp.userapi.com/c851520/v851520494/f1d60/bBiJVwiCYMk.jpg)
-        pinIcon.setIcon(
-                "icon",
-                ImageProvider.fromResource(this, R.drawable.user_arrow),
-                new IconStyle().setAnchor(new PointF(0f, 0f))
-                        .setRotationType(RotationType.ROTATE)
-                        .setZIndex(0f)
-                        .setScale(1f)
-        );
-*/
-        pinIcon.setIcon(
-                "pin",
-                ImageProvider.fromResource(this, R.drawable.search_result),
-                new IconStyle().setAnchor(new PointF(0.5f, 0.5f))
-                        .setRotationType(RotationType.ROTATE)
-                        .setZIndex(1f)
-                        .setScale(0.5f)
-        );
-
-        userLocationView.getAccuracyCircle().setFillColor(Color.argb(50,51,255,255));
-    }
-
-    @Override
-    public void onObjectRemoved(UserLocationView view) {
-    }
-
-    @Override
-    public void onObjectUpdated(UserLocationView view, ObjectEvent event) {
-    }
-
+/*
     public void onGPSButtonClick(View view) {
         _mapview.getMap().move(
                 new CameraPosition(_userLocationLayer.cameraPosition().getTarget(), 16.0f, 0.0f, 0.0f),
                 new Animation(Animation.Type.SMOOTH, 1),
                 null);
-    }
+    }*/
 }
