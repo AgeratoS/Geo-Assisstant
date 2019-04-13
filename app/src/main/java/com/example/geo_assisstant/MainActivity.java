@@ -2,63 +2,79 @@ package com.example.geo_assisstant;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 
-import com.yandex.mapkit.user_location.UserLocationLayer;
-
+import org.mapsforge.map.layer.download.tilesource.TileSource;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
+
+    // Задания на ближайшую неделю
+    // TODO: 1. Реализовать поиск пользователя по геолокации
+    // TODO: 2. Написать код, позволяющий устанавливать метки на карте
 
 
-    private org.osmdroid.views.MapView _mapview = null;
-    private UserLocationLayer _userLocationLayer;
+
+    private MapView _mapview;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private AlertDialog.Builder _ad;
+    RotationGestureOverlay _rotationGestureOverlay;
+
     private MyLocationNewOverlay mLocationOverlay;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // Создание карты и всякая хуйня
+        // Создание и инициализация карт
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        _mapview = (org.osmdroid.views.MapView) findViewById(R.id.map);
-        _mapview.setTileSource(TileSourceFactory.MAPNIK);
-        _mapview.setBuiltInZoomControls(true);
-        _mapview.setMultiTouchControls(true);
         // Проверка разрешений
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if ((ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
             // Permission is not granted
             requestPermission();
-        }
-        else
-        {
+        } else {
             onAllGood();
         }
-    }
+
+
+}
+
    /* @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         _mapview = new MapView(inflater.getContext(), 256, getContext());
         return _mapview;
     }*/
+
+//   Метод для получения необходимых разрешений
     protected void requestPermission()
     {
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 MY_PERMISSIONS_REQUEST_LOCATION);
     }
+
+//    Обработка разрешений, которые дал пользователь
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults)
@@ -100,22 +116,37 @@ public class MainActivity extends AppCompatActivity  {
         //Configuration.getInstance().save(this, prefs);
         _mapview.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
+
+    //Когда разрешения получены, выполняется этот метод
     protected void onAllGood()
     {
+        setupMap();
+
         IMapController mapController = _mapview.getController();
-        mapController.setZoom(9.5);
-        GeoPoint startPoint = new GeoPoint(48.8583, 2.2944);
-        mapController.setCenter(startPoint);
-        /*Context context = null;
-        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(context),_mapview);
-        this.mLocationOverlay.enableMyLocation();
-        _mapview.getOverlays().add(this.mLocationOverlay);*/
+        mapController.setZoom(3.5);
     }
-/*
-    public void onGPSButtonClick(View view) {
-        _mapview.getMap().move(
-                new CameraPosition(_userLocationLayer.cameraPosition().getTarget(), 16.0f, 0.0f, 0.0f),
-                new Animation(Animation.Type.SMOOTH, 1),
-                null);
-    }*/
+//    Метод инициализации карты
+    private void setupMap()
+    {
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+
+        setContentView(R.layout.activity_main);
+        _mapview =(MapView)findViewById(R.id.map);
+
+        _mapview.setTileSource(TileSourceFactory.MAPNIK);
+        _mapview.setMultiTouchControls(true);
+
+//        Настраиваем "поворот" карт
+        _rotationGestureOverlay = new RotationGestureOverlay(ctx, _mapview);
+        _rotationGestureOverlay.setEnabled(true);
+        _mapview.getOverlays().add(this._rotationGestureOverlay);
+    }
+
+//    По нажатию на кнопку "Найти себя" на карте отображается положение пользователя
+//    TODO: реализовать поиск пользователя по нажатию кнопки
+    public void onGPSButtonClick(View view)
+    {
+        Log.d("Geolocation", "Definition of user location...");
+    }
 }
