@@ -21,8 +21,17 @@ public class MenuActivity extends AppCompatActivity {
     public void onButtonExit(View view) {
 
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
-            finishAffinity();
-            android.os.Process.killProcess(android.os.Process.myPid());
+
+//          Полное закрытие приложения
+//          finishAffinity();
+//          android.os.Process.killProcess(android.os.Process.myPid());
+
+//          Сворачивание в трей
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startMain);
+            super.onBackPressed();
         } else {
             Toast.makeText(getBaseContext(), "Нажмите еще раз для выхода из приложения", Toast.LENGTH_SHORT).show();
         }
