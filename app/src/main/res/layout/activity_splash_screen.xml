@@ -39,7 +39,7 @@
             android:layout_width="220dp"
             android:layout_height="220dp"
             android:layout_gravity="center"
-            android:progressDrawable="@drawable/circleprogress"
+            android:progressDrawable="@drawable/circle_progress"
             android:rotation="270" />
 
         <TextView

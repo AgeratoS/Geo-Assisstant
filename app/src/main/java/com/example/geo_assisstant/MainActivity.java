@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -145,8 +146,14 @@ public class MainActivity extends AppCompatActivity {
 
 //    По нажатию на кнопку "Найти себя" на карте отображается положение пользователя
 //    TODO: реализовать поиск пользователя по нажатию кнопки
-    public void onGPSButtonClick(View view)
+    public void onLocationButtonClick(View view)
     {
         Log.d("Geolocation", "Definition of user location...");
+    }
+
+//    Переход в меню по нажатию кнопки
+    public void onMenuButtonClick(View view) {
+        Intent intent =new Intent(MainActivity.this,MenuActivity.class);
+        startActivity(intent);
     }
 }

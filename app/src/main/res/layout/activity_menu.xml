@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/menu_background"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center|top"
+        android:orientation="vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/profile_image"
+            android:layout_width="155dp"
+            android:layout_height="155dp"
+            android:src="@drawable/profilepic"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Александр Пушкин"
+            android:textColor="#ffffff"
+            android:textSize="25dp"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginTop="250dp">
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/ripple_effect_menu_button"
+            android:textAllCaps="false"
+            android:text="Профиль"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            />
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/ripple_effect_menu_button"
+            android:textAllCaps="false"
+            android:text="Создать геометку"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:layout_marginTop="2dp"
+            android:onClick="onButtonGeoCreate"
+            />
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/ripple_effect_menu_button"
+            android:textAllCaps="false"
+            android:text="История"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:layout_marginTop="2dp"
+            />
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/ripple_effect_menu_button"
+            android:textAllCaps="false"
+            android:text="Настройки"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:layout_marginTop="2dp"
+            />
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/ripple_effect_menu_button"
+            android:textAllCaps="false"
+            android:text="Выход"
+            android:textColor="#ffffff"
+            android:textSize="20dp"
+            android:layout_marginTop="2dp"
+            android:onClick="onButtonExit"
+            />
+    </LinearLayout>
+
+
+
+</android.support.constraint.ConstraintLayout>
