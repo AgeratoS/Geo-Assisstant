@@ -1,10 +1,14 @@
 package com.example.geo_assisstant;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
@@ -13,16 +17,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import org.mapsforge.map.layer.download.tilesource.TileSource;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+import org.mapsforge.map.android.layers.MyLocationOverlay;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener{
 
     // Задания на ближайшую неделю
     // TODO: 1. Реализовать поиск пользователя по геолокации
@@ -33,9 +37,12 @@ public class MainActivity extends AppCompatActivity {
     private MapView _mapview;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private AlertDialog.Builder _ad;
-    RotationGestureOverlay _rotationGestureOverlay;
+    private RotationGestureOverlay _rotationGestureOverlay;
+    private GeoPoint _currentLocation;
+    private LocationListener _locationListener;
+    private LocationManager _locationManager;
 
-    private MyLocationNewOverlay mLocationOverlay;
+
 
 
     @Override
@@ -56,16 +63,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             onAllGood();
         }
-
-
 }
-
-   /* @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        _mapview = new MapView(inflater.getContext(), 256, getContext());
-        return _mapview;
-    }*/
-
 //   Метод для получения необходимых разрешений
     protected void requestPermission()
     {
@@ -118,12 +116,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Когда разрешения получены, выполняется этот метод
+    @SuppressLint("MissingPermission")
     protected void onAllGood()
     {
         setupMap();
 
         IMapController mapController = _mapview.getController();
         mapController.setZoom(3.5);
+        Bundle savedInstanceState = null;
+        super.onCreate(savedInstanceState);
+        _locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                _currentLocation = new GeoPoint(location);
+                displayMyCurrentLocationOverlay();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, _locationListener);
+        Location location = _locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if( location != null ) {
+            _currentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+        }
+
     }
 //    Метод инициализации карты
     private void setupMap()
@@ -148,5 +178,41 @@ public class MainActivity extends AppCompatActivity {
     public void onGPSButtonClick(View view)
     {
         Log.d("Geolocation", "Definition of user location...");
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        _currentLocation = new GeoPoint(location);
+        displayMyCurrentLocationOverlay();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+    private void displayMyCurrentLocationOverlay() {
+        if( _currentLocation != null) {
+            ArrayItemizedOverlay currentLocationOverlay = null;
+            if( currentLocationOverlay == null ) {
+                currentLocationOverlay = new ArrayItemizedOverlay(myLocationMarker);
+                myCurrentLocationOverlayItem = new OverlayItem(currentLocation, "My Location", "My Location!");
+                currentLocationOverlay.addItem(myCurrentLocationOverlayItem);
+                mapView.getOverlays().add(currentLocationOverlay);
+            } else {
+                myCurrentLocationOverlayItem.setPoint(currentLocation);
+                currentLocationOverlay.requestRedraw();
+            }
+            mapView.getController().setCenter(currentLocation);
+        }
     }
 }
