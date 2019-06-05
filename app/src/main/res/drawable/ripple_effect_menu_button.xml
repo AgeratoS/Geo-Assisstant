@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:color="#511d69"
+    tools:targetApi="lollipop">
+    <item android:drawable="@drawable/menu_button_background">
+        <shape android:shape="rectangle">
+            <solid android:color="#511d69" />
+        </shape>
+    </item>
+</ripple>

@@ -19,15 +19,35 @@
         tools:layout_editor_absoluteY="154dp">
 
         <ImageButton
-            android:id="@+id/gpsButton"
+            android:id="@+id/mapLocationButton"
             android:layout_width="55dp"
             android:layout_height="55dp"
-            android:background="@drawable/gpsbuttonanim"
+            android:background="@drawable/map_location_button_anim"
             android:layout_gravity="center|right"
             android:layout_marginRight="5dp"
-            android:onClick="onGPSButtonClick"
-            android:transitionName="gpsButton"
+            android:onClick="onLocationButtonClick"
+            android:transitionName="mapLocationButton"
             />
+        <ImageButton
+            android:id="@+id/mapMenuButton"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/map_menu_button_anim"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="65dp"
+            android:onClick="onMenuButtonClick"
+            />
+        <ImageButton
+            android:id="@+id/mapSettingsButton"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:background="@drawable/map_settings_button_anim"
+            android:layout_gravity="center|right"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="130dp"
+            />
+
     </FrameLayout>
 
 

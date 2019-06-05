@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
     <item>
-        <bitmap android:src="@drawable/gpsbutton"/>
+        <bitmap android:src="@drawable/map_settings_button"/>
     </item>
     <item>
         <shape xmlns:android="http://schemas.android.com/apk/res/android"
