@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,37 +20,50 @@ import android.view.View;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.mapsforge.map.android.layers.MyLocationOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.compass.CompassOverlay;
+import org.osmdroid.views.overlay.mylocation.DirectedLocationOverlay;
 
-public class MainActivity extends AppCompatActivity implements LocationListener{
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    // Задания на ближайшую неделю
-    // TODO: 1. Реализовать поиск пользователя по геолокации
-    // TODO: 2. Написать код, позволяющий устанавливать метки на карте
-
-
-
-    private MapView _mapview;
+    MapView map = null;
+    private MapView osm;
+    private MapController _mapControl;
+    private LocationManager locationManager;
+    private CompassOverlay compassOverlay;
+    private DirectedLocationOverlay locationOverlay;
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private boolean _followMe = true;
+    private boolean _locationOverAdded = false;
+    private GeoPoint _myLocation;
+    private Marker _myLocationMarker;
     private AlertDialog.Builder _ad;
-    private RotationGestureOverlay _rotationGestureOverlay;
-    private GeoPoint _currentLocation;
-    private LocationListener _locationListener;
-    private LocationManager _locationManager;
 
 
 
-
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // Создание и инициализация карт
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Context ctx = getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        osm = findViewById(R.id.map);
+        osm.setTileSource(TileSourceFactory.MAPNIK);
+        osm.setBuiltInZoomControls(true);
+        osm.setMultiTouchControls(true);
+        _mapControl = (MapController) osm.getController();
+        _mapControl.setZoom(8);
+
+
 
         // Проверка разрешений
         if ((ContextCompat.checkSelfPermission(this,
@@ -61,18 +75,79 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             // Permission is not granted
             requestPermission();
         } else {
+
             onAllGood();
         }
-}
-//   Метод для получения необходимых разрешений
+        //onde mostra a imagem do mapa
+
+        /*
+        _myLocationMarker.setPosition(new GeoPoint(_myLocation.getLatitude(), _myLocation.getLongitude()));;
+        _mapControl.animateTo((IGeoPoint) _myLocationMarker);
+        addMarker(center);
+        */
+
+    }
+
+    @SuppressLint({"ClickableViewAccessibility", "MissingPermission"})
+    private void onAllGood() {
+
+
+
+        /* grade no mapa
+        LatLonGridlineOverlay2 overlay = new LatLonGridlineOverlay2();
+        osm.getOverlays().add(overlay);
+        */
+
+        osm.setMapListener(new MapListener() {
+            @Override
+            public boolean onScroll(ScrollEvent event) {
+                Log.i("Script", "onScroll()");
+                return false;
+            }
+
+            @Override
+            public boolean onZoom(ZoomEvent event) {
+                Log.i("Script", "onZoom()");
+                return false;
+            }
+        });
+/*
+        findViewById(R.id.mapLocationButton).setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN: {
+                    ImageButton view = (ImageButton) v;
+                    view.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                    v.invalidate();
+                    break;
+                }
+                case MotionEvent.ACTION_UP:
+
+                    // Your action here on button click
+                    _followMe = !_followMe;
+
+                case MotionEvent.ACTION_CANCEL: {
+                    ImageButton view = (ImageButton) v;
+                    view.getBackground().clearColorFilter();
+                    view.invalidate();
+                    break;
+                }
+            }
+            return true;
+        });*/
+
+        addOverlays();
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, this);
+
+    }
+
     protected void requestPermission()
     {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                 MY_PERMISSIONS_REQUEST_LOCATION);
     }
-
-//    Обработка разрешений, которые дал пользователь
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions,
                                            int[] grantResults)
@@ -92,98 +167,64 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                     .show();
         }
         else
-                {
-                // Permission has already been granted
-                onAllGood();
-                }
+        {
+            // Permission has already been granted
+            onAllGood();
+        }
     }
-    public void onResume(){
+
+    public void addOverlays() {
+        _myLocationMarker = new Marker(osm);
+        _myLocationMarker.setIcon(getResources().getDrawable(R.drawable.search_result));
+        _myLocationMarker.setImage(getResources().getDrawable(R.drawable.search_result));
+
+
+    }
+
+    public void addMarker (GeoPoint center){
+        Marker marker = new Marker(osm);
+        marker.setPosition(center);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(getResources().getDrawable(R.drawable.tapimage));
+        osm.getOverlays().clear();
+        osm.getOverlays().add(marker);
+        osm.invalidate();
+        marker.setTitle("Casa do Josileudo");
+    }
+
+    public void onResume() {
         super.onResume();
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this));
-        _mapview.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+
     }
+
 
     public void onPause(){
         super.onPause();
-        //this will refresh the osmdroid configuration on resuming.
-        //if you make changes to the configuration, use
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        //Configuration.getInstance().save(this, prefs);
-        _mapview.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
+    /*
+        @Override
+        public void onLocationChanged(Location location) {
+            GeoPoint center = new GeoPoint(location.getLatitude(), location.getLongitude());
 
-    //Когда разрешения получены, выполняется этот метод
-    @SuppressLint("MissingPermission")
-    protected void onAllGood()
-    {
-        setupMap();
+            mc.animateTo(center);
+            addMarker(center);
 
-        IMapController mapController = _mapview.getController();
-        mapController.setZoom(3.5);
-        Bundle savedInstanceState = null;
-        super.onCreate(savedInstanceState);
-        _locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                _currentLocation = new GeoPoint(location);
-                displayMyCurrentLocationOverlay();
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        _locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        _locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, _locationListener);
-        Location location = _locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if( location != null ) {
-            _currentLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-        }
-
-    }
-//    Метод инициализации карты
-    private void setupMap()
-    {
-        Context ctx = getApplicationContext();
-        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-
-        setContentView(R.layout.activity_main);
-        _mapview =(MapView)findViewById(R.id.map);
-
-        _mapview.setTileSource(TileSourceFactory.MAPNIK);
-        _mapview.setMultiTouchControls(true);
-
-//        Настраиваем "поворот" карт
-        _rotationGestureOverlay = new RotationGestureOverlay(ctx, _mapview);
-        _rotationGestureOverlay.setEnabled(true);
-        _mapview.getOverlays().add(this._rotationGestureOverlay);
-    }
-
-//    По нажатию на кнопку "Найти себя" на карте отображается положение пользователя
-//    TODO: реализовать поиск пользователя по нажатию кнопки
-    public void onGPSButtonClick(View view)
-    {
-        Log.d("Geolocation", "Definition of user location...");
-    }
+        }*/
 
     @Override
     public void onLocationChanged(Location location) {
-        _currentLocation = new GeoPoint(location);
-        displayMyCurrentLocationOverlay();
+        _myLocation = new GeoPoint(location.getLatitude(),location.getLongitude());
+        _myLocationMarker.setPosition(_myLocation);
+        if (!_locationOverAdded) {
+            osm.getOverlayManager().add(_myLocationMarker);
+            _locationOverAdded = true;
+        }
+
+        IMapController mapController = osm.getController();
+        mapController.setZoom(15);
+        mapController.setCenter(_myLocation);
+        osm.getController().animateTo(_myLocation);
+
     }
 
     @Override
@@ -200,19 +241,34 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     public void onProviderDisabled(String provider) {
 
     }
-    private void displayMyCurrentLocationOverlay() {
-        if( _currentLocation != null) {
-            ArrayItemizedOverlay currentLocationOverlay = null;
-            if( currentLocationOverlay == null ) {
-                currentLocationOverlay = new ArrayItemizedOverlay(myLocationMarker);
-                myCurrentLocationOverlayItem = new OverlayItem(currentLocation, "My Location", "My Location!");
-                currentLocationOverlay.addItem(myCurrentLocationOverlayItem);
-                mapView.getOverlays().add(currentLocationOverlay);
-            } else {
-                myCurrentLocationOverlayItem.setPoint(currentLocation);
-                currentLocationOverlay.requestRedraw();
-            }
-            mapView.getController().setCenter(currentLocation);
+    @Override
+    public void onDestroy(){
+        super.onDestroy();//`enter code here`
+        if (locationManager != null){
+            locationManager.removeUpdates(this);
         }
     }
-}
+
+//    По нажатию на кнопку "Найти себя" на карте отображается положение пользователя
+//    TODO: реализовать поиск пользователя по нажатию кнопки
+
+
+    public void onLocationButtonClick(View view)
+    {
+        if (_followMe)
+        {
+            _followMe = false;
+        }
+        else
+        {
+            _followMe = true;
+        }
+        // Log.d("Geolocation", "Definition of user location...");
+    }
+
+    //    Переход в меню по нажатию кнопки
+    public void onMenuButtonClick(View view) {
+        Intent intent =new Intent(MainActivity.this,MenuActivity.class);
+        startActivity(intent);
+    }
+} 	
